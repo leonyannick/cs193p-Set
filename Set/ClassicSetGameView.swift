@@ -10,45 +10,48 @@ import SwiftUI
 struct ClassicSetGameView: View {
     @ObservedObject var classicSet: ClassicSetGame
     
+    let aspectRatio = 2.0 / 3.0
+    
     var body: some View {
-        ScrollView {
-            VStack {
-//                let card = classicSet.testCard
-//                CardView(card: card)
-                ForEach(classicSet.cards) { card in
-                    CardView(card: card)
-                }
-                
-            }
-                .padding()
+        cards
+    }
+    
+    private var cards: some View {
+        AspectVGrid(classicSet.cards, aspectRatio: aspectRatio) { card in
+            CardView(card: card, aspectRatio: aspectRatio)
+                .onTapGesture { classicSet.choose(card) }
         }
     }
 }
 
+/// A view that displays a Set game card with a shape, color, shading, and amount, based on its model.
 struct CardView: View {
-    let aspectRatio = 2.0 / 3.0
+    /// The card model containing visual attributes (shape, color, shading, and amount).
     let card: SetGame.Card
     
-    init(card: SetGame.Card) {
-        self.card = card
-    }
-    
+    /// The fixed aspect ratio for the card (2:3).
+    let aspectRatio: CGFloat
+
+    /// The view body that defines the layout and styling of the card.
     var body: some View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 12)
-            base.fill(.white)
+            base.fill(backgroundColor)
             base.strokeBorder(lineWidth: 2)
-            
+
             HStack {
                 ForEach(0..<amount, id: \.self) { _ in
                     shape
+                        .padding(3)
                 }
             }
-                .padding()
+                .padding(4)
+
         }
-            .aspectRatio(aspectRatio, contentMode: .fit)
+        .aspectRatio(aspectRatio, contentMode: .fit)
     }
-    
+
+    /// Returns a shape view with applied color and shading, based on the card's shape type.
     @ViewBuilder
     private var shape: some View {
         switch card.shape {
@@ -60,39 +63,65 @@ struct CardView: View {
             applyColorAndShading(to: Rectangle())
         }
     }
-    
+
+    /// Applies both color and shading (via opacity) to a given shape and outlines it.
+    ///
+    /// - Parameter shape: The base shape to apply visual styling to.
+    /// - Returns: A view with filled and stroked styling applied to the shape.
     private func applyColorAndShading(to shape: some Shape) -> some View {
         ZStack {
             shape
-                .fill(color)
+                .fill(shapeColor)
                 .opacity(opacity)
             shape
-                .stroke(color, lineWidth: 2)
+                .stroke(shapeColor, lineWidth: 2)
         }
     }
-    
+
+    /// The number of shape symbols to display on the card.
     var amount: Int {
         card.amount.rawValue
     }
-    
-    var color: Color {
-        switch card.color{
-        case .one: .red
-        case .two: .blue
-        case .three: .green
+
+    /// The color to apply to the shape based on the card's color attribute.
+    var shapeColor: Color {
+        switch card.color {
+        case .one:
+                .purple
+        case .two:
+                .blue
+        case .three:
+                .orange
+        }
+    }
+
+    /// The opacity to apply to the shape based on the card's shading attribute.
+    var opacity: Double {
+        switch card.shading {
+        case .one:
+            1.0       // Solid
+        case .two:
+            0.0       // Outline
+        case .three:
+            0.5     // Striped
         }
     }
     
-    var opacity: Double {
-        switch card.shading {
-        case .one: 1
-        case .two: 0
-        case .three: 0.5
+    var backgroundColor: Color {
+        switch card.selection {
+        case .none:
+            .white
+        case .selected:
+            .gray
+        case .validSet:
+            .green
+        case .invalidSet:
+            .red
         }
     }
 }
 
-///Returns a diamond-like Shape
+///A diamond-like Shape
 struct Diamond: Shape {
     func path(in rect: CGRect) -> Path {
         var diamondPath = Path()

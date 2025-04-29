@@ -11,12 +11,15 @@ class ClassicSetGame: ObservableObject {
     @Published private(set) var setGame = SetGame()
     
     var cards: [SetGame.Card] {
-        print(setGame.cards)
-        return setGame.cards
+        return setGame.displayedCards
     }
     
     var testCard: SetGame.Card {
         return setGame.testCard
+    }
+    
+    func choose(_ card: SetGame.Card) {
+        setGame.choose(card)
     }
 }
 
