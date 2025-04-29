@@ -7,24 +7,42 @@
 
 import Foundation
 
-struct SetGame<CardContent: Equatable> {
-    private(set) var cards: [Card]
-    private let numberOfCards = 81
+struct SetGame {
+    private(set) var cards: [Card] = []
     
-    init(makeCardContent: () -> CardContent) {
-        for index in 0..<numberOfCards {
-            cards.append(Card(id: "\(index)", content: makeCardContent()))
+    var testCard = Card(shape: Feature.two, color: Feature.one, shading: Feature.three, amount: Feature.three)
+    
+    init() {
+        for shape in Feature.allCases {
+            for color in Feature.allCases {
+                for shading in Feature.allCases {
+                    for amount in Feature.allCases {
+                        cards.append(Card(
+                            shape: shape,
+                            color: color,
+                            shading: shading,
+                            amount: amount
+                        ))
+                    }
+                }
+            }
         }
     }
     
-    struct Card: Identifiable, Equatable {
-        var id: String
+    struct Card: Identifiable, Equatable, CustomDebugStringConvertible {
+        var id = UUID()
         
-        enum featureOne { case one, two, three }
-        enum featureTwo { case one, two, three }
-        enum featureThree { case one, two, three }
+        let shape: Feature
+        let color: Feature
+        let shading: Feature
+        let amount: Feature
+        
+        var debugDescription: String { "[\(shape), \(color), \(shading), \(amount)]" }
     }
     
+    enum Feature: Int, CaseIterable {
+        case one = 1, two, three
+    }
 }
 
 

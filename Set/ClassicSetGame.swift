@@ -10,6 +10,13 @@ import Foundation
 class ClassicSetGame: ObservableObject {
     @Published private(set) var setGame = SetGame()
     
-    var cards { return setGame.cards }
+    var cards: [SetGame.Card] {
+        print(setGame.cards)
+        return setGame.cards
+    }
+    
+    var testCard: SetGame.Card {
+        return setGame.testCard
+    }
 }
 
