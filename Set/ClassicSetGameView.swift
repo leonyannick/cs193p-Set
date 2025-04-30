@@ -113,9 +113,9 @@ struct CardView: View {
             .white
         case .selected:
             .gray
-        case .validSet:
+        case .containedInValidSet:
             .green
-        case .invalidSet:
+        case .containedInInvalidSet:
             .red
         }
     }

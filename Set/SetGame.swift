@@ -45,73 +45,65 @@ struct SetGame {
         }
     }
     
+    mutating func discardCards(_ cards: [Card]) {
+        for card in cards {
+            if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
+                displayedCards.remove(at: index)
+            }
+        }
+    }
+    
+    private mutating func changeSelection(of cards: [Card], to selection: selectionMode) {
+        for card in cards {
+            if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
+                displayedCards[index].selection = selection
+            }
+        }
+    }
+    
     mutating func choose(_ card: Card) {
-        if let chosenIndex = displayedCards.firstIndex(where: { $0.id == card.id }) {
-            if potentialSet.count == 2 || potentialSet.count == 1 || potentialSet.isEmpty {
+        /// none, one or two cards are already selected; it is possible for another card to be selected; distinguish between selection and deselction
+        if potentialSet.count == 2 || potentialSet.count == 1 || potentialSet.isEmpty {
+            switch card.selection {
+            case .none:
+                potentialSet.append(card)
+                changeSelection(of: [card], to: selectionMode.selected)
+            default:
+                potentialSet.removeAll { $0.id == card.id }
+                changeSelection(of: [card], to: selectionMode.none)
+            }
+        } else { /// three cards are already selected
+            if validSet { ///three selected cards are a valid set; pressing a card that is part of the set does nothing;
+                /// pressing any other card removes the valid set and selects the new card
                 switch card.selection {
-                case .none:
-                    print("unselected card")
-                    displayedCards[chosenIndex].selection = .selected
-                    potentialSet.append(card)
+                case .containedInValidSet:
+                    break
                 default:
-                    print("selected card")
-                    displayedCards[chosenIndex].selection = .none
-                    potentialSet.removeAll { $0.id == card.id }
-                }
-            }
-            else {
-                if validSet {
-                    switch card.selection {
-                    case .validSet:
-                        break
-                    default:
-                        
-                        print("n: \(displayedCards.count)")
-                        for card in potentialSet {
-                            if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
-                                displayedCards.remove(at: index)
-                            }
-                        }
-                        potentialSet.removeAll()
-                        displayedCards[chosenIndex].selection = .selected
-                        potentialSet.append(card)
-                        print("n2: \(displayedCards.count)")
-                        drawCards(count: 3)
-                        validSet = false
-                        
-                    }
-                }
-                else {
-                    for card in potentialSet {
-                        if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
-                            displayedCards[index].selection = .none
-                        }
-                    }
+                    discardCards(potentialSet)
                     potentialSet.removeAll()
-                    displayedCards[chosenIndex].selection = .selected
                     potentialSet.append(card)
-                }
-                
-            }
-            
-            if potentialSet.count == 3 {
-                print("valid set")
-                if checkForSet() {
-                    validSet = true
-                    for card in potentialSet {
-                        if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
-                            displayedCards[index].selection = .validSet
-                        }
-                    }
-                } else {
-                    print("invalid set")
+                    changeSelection(of: [card], to: selectionMode.selected)
+                    drawCards(count: 3)
                     validSet = false
-                    for card in potentialSet {
-                        if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
-                            displayedCards[index].selection = .invalidSet
-                        }
-                    }
                 }
+            }
+            else { /// three selected cards are an invalid set; pressing any card deselects the invalid set and selects the new card
+                changeSelection(of: potentialSet, to: selectionMode.none)
+                potentialSet.removeAll()
+                potentialSet.append(card)
+                changeSelection(of: [card], to: selectionMode.selected)
+            }
+        }
+        /// if at this point there are three cards and no valid set yet check if these cards are a valid set
+        if potentialSet.count == 3 && !validSet {
+            if checkForSet() {
+                print("valid set")
+                validSet = true
+                changeSelection(of: potentialSet, to: selectionMode.containedInValidSet)
+            } else {
+                print("invalid set")
+                validSet = false
+                changeSelection(of: potentialSet, to: selectionMode.containedInInvalidSet)
             }
         }
     }
@@ -127,19 +119,15 @@ struct SetGame {
         
         if !checkEqualityOfFeature(cardOne.shape, cardTwo.shape, cardThree.shape) &&
             !checkUniquenessOfFeature(cardOne.shape, cardTwo.shape, cardThree.shape) {
-            print("shape")
             return false }
         if !checkEqualityOfFeature(cardOne.color, cardTwo.color, cardThree.color) &&
             !checkUniquenessOfFeature(cardOne.color, cardTwo.color, cardThree.color) {
-            print("color")
             return false }
         if !checkEqualityOfFeature(cardOne.shading, cardTwo.shading, cardThree.shading) &&
             !checkUniquenessOfFeature(cardOne.shading, cardTwo.shading, cardThree.shading) {
-            print("shading")
             return false }
         if !checkEqualityOfFeature(cardOne.amount, cardTwo.amount, cardThree.amount) &&
             !checkUniquenessOfFeature(cardOne.amount, cardTwo.amount, cardThree.amount) {
-            print("amount")
             return false }
         return true
     }
@@ -172,8 +160,8 @@ struct SetGame {
     enum selectionMode {
         case none
         case selected
-        case validSet
-        case invalidSet
+        case containedInValidSet
+        case containedInInvalidSet
     }
 }
 
