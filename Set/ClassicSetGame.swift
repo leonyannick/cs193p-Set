@@ -18,6 +18,10 @@ class ClassicSetGame: ObservableObject {
         return setGame.cardPile.count
     }
     
+    var gameEnded: Bool {
+        return setGame.gameEnded
+    }
+    
     var testCard: SetGame.Card {
         return setGame.testCard
     }

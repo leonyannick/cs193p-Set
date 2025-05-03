@@ -15,12 +15,14 @@ struct ClassicSetGameView: View {
     
     var body: some View {
         VStack {
-            cards
-            HStack {
-                if (classicSet.numberCardsOnPile > 0) {
-                    threeNewCardsButton
-                }
-                newGameButton
+            newGameButton
+            if classicSet.gameEnded {
+                Text("Game finished!")
+            } else {
+                cards
+            }
+            if (classicSet.numberCardsOnPile > 0) {
+                threeNewCardsButton
             }
         }
     }
@@ -39,8 +41,7 @@ struct ClassicSetGameView: View {
                 classicSet.threeNewCards()
             }, label: {
                 HStack {
-                    Image(systemName: "rectangle.stack.fill")
-                    Text("more cards")
+                    Image(systemName: "rectangle.stack.badge.plus")
                 }
                     .foregroundColor(.black)
                     .font(.title)
@@ -178,7 +179,6 @@ struct Diamond: Shape {
         return diamondPath
     }
 }
-
 
 #Preview {
     ClassicSetGameView(classicSet: ClassicSetGame())

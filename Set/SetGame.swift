@@ -14,6 +14,10 @@ struct SetGame {
     
     private(set) var validSet = false
     
+    var gameEnded: Bool {
+        (cardPile.isEmpty && displayedCards.count == 3) ? true : false
+    }
+    
     var testCard = Card(shape: Feature.two, color: Feature.one, shading: Feature.three, amount: Feature.three)
     
     init() {
