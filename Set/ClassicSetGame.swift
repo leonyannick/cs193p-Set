@@ -14,6 +14,10 @@ class ClassicSetGame: ObservableObject {
         return setGame.displayedCards
     }
     
+    var numberCardsOnPile: Int {
+        return setGame.cardPile.count
+    }
+    
     var testCard: SetGame.Card {
         return setGame.testCard
     }
@@ -27,7 +31,7 @@ class ClassicSetGame: ObservableObject {
     }
     
     func threeNewCards() {
-        setGame.drawCards(count: 3)
+        setGame.dealThreeMoreCards()
     }
 }
 

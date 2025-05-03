@@ -11,19 +11,22 @@ struct ClassicSetGameView: View {
     @ObservedObject var classicSet: ClassicSetGame
     
     let aspectRatio = 2.0 / 3.0
+    let minCardWidth = 70.0
     
     var body: some View {
         VStack {
             cards
             HStack {
-                threeNewCardsButton
+                if (classicSet.numberCardsOnPile > 0) {
+                    threeNewCardsButton
+                }
                 newGameButton
             }
         }
     }
     
     private var cards: some View {
-        AspectVGrid(classicSet.cards, aspectRatio: aspectRatio, minItemSize: 100) { card in
+        AspectVGrid(classicSet.cards, aspectRatio: aspectRatio, minItemSize: minCardWidth) { card in
             CardView(card: card, aspectRatio: aspectRatio)
                 .onTapGesture { classicSet.choose(card) }
                 .padding(1)

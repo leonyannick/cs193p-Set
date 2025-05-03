@@ -12,8 +12,7 @@ struct SetGame {
     private(set) var displayedCards: [Card] = []
     private(set) var potentialSet: [Card] = []
     
-//    private var numberOfSelectedCards = 0
-    private var validSet = false
+    private(set) var validSet = false
     
     var testCard = Card(shape: Feature.two, color: Feature.one, shading: Feature.three, amount: Feature.three)
     
@@ -36,7 +35,15 @@ struct SetGame {
         drawCards(count: 12)
     }
     
-    mutating func drawCards(count: Int){
+    mutating func dealThreeMoreCards () {
+        if validSet {
+            replaceCards(potentialSet)
+        } else {
+            drawCards(count: 3)
+        }
+    }
+    
+    private mutating func drawCards(count: Int){
         for _ in 0..<count {
             let card = cardPile.popLast()
             if let card {
@@ -45,10 +52,14 @@ struct SetGame {
         }
     }
     
-    private mutating func discardCards(_ cards: [Card]) {
+    private mutating func replaceCards(_ cards: [Card]) {
         for card in cards {
             if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
                 displayedCards.remove(at: index)
+                let newCard = cardPile.popLast()
+                if let newCard {
+                    displayedCards.insert(newCard, at: index)
+                }
             }
         }
     }
@@ -79,11 +90,10 @@ struct SetGame {
                 case .containedInValidSet:
                     break
                 default:
-                    discardCards(potentialSet)
+                    replaceCards(potentialSet)
                     potentialSet.removeAll()
                     potentialSet.append(card)
                     changeSelection(of: [card], to: selectionMode.selected)
-                    drawCards(count: 3)
                     validSet = false
                 }
             }
