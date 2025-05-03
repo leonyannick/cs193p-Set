@@ -11,10 +11,12 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     let items: [Item]
     var aspectRatio: CGFloat = 1
     let content: (Item) -> ItemView
+    var minItemSize: CGFloat = 100
     
-    init(_ items: [Item], aspectRatio: CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
+    init(_ items: [Item], aspectRatio: CGFloat, minItemSize: CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
         self.items = items
         self.aspectRatio = aspectRatio
+        self.minItemSize = minItemSize
         self.content = content
     }
     
@@ -25,11 +27,22 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                 size: geometry.size,
                 atAspectRatio: aspectRatio
             )
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
-                ForEach(items) { item in
-                    content(item)
-                        .aspectRatio(aspectRatio, contentMode: .fit)
+            if gridItemSize >= minItemSize {
+                layoutItemsInGrid(itemSize: gridItemSize)
+            } else {
+                ScrollView {
+                    layoutItemsInGrid(itemSize: minItemSize)
                 }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func layoutItemsInGrid(itemSize: CGFloat) -> some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: itemSize), spacing: 0)], spacing: 0) {
+            ForEach(items) { item in
+                content(item)
+                    .aspectRatio(aspectRatio, contentMode: .fit)
             }
         }
     }
@@ -54,3 +67,4 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         return min(size.width / count, size.height * aspectRatio).rounded(.down)
     }
 }
+

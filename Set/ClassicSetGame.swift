@@ -21,5 +21,13 @@ class ClassicSetGame: ObservableObject {
     func choose(_ card: SetGame.Card) {
         setGame.choose(card)
     }
+    
+    func newGame() {
+        setGame = SetGame()
+    }
+    
+    func threeNewCards() {
+        setGame.drawCards(count: 3)
+    }
 }
 

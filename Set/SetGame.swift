@@ -45,7 +45,7 @@ struct SetGame {
         }
     }
     
-    mutating func discardCards(_ cards: [Card]) {
+    private mutating func discardCards(_ cards: [Card]) {
         for card in cards {
             if let index = displayedCards.firstIndex(where: { $0.id == card.id }) {
                 displayedCards.remove(at: index)

@@ -13,15 +13,51 @@ struct ClassicSetGameView: View {
     let aspectRatio = 2.0 / 3.0
     
     var body: some View {
-        cards
+        VStack {
+            cards
+            HStack {
+                threeNewCardsButton
+                newGameButton
+            }
+        }
     }
     
     private var cards: some View {
-        AspectVGrid(classicSet.cards, aspectRatio: aspectRatio) { card in
+        AspectVGrid(classicSet.cards, aspectRatio: aspectRatio, minItemSize: 100) { card in
             CardView(card: card, aspectRatio: aspectRatio)
                 .onTapGesture { classicSet.choose(card) }
+                .padding(1)
         }
+            .animation(.default, value: classicSet.cards)
     }
+    
+    private var threeNewCardsButton: some View {
+            Button(action: {
+                classicSet.threeNewCards()
+            }, label: {
+                HStack {
+                    Image(systemName: "rectangle.stack.fill")
+                    Text("more cards")
+                }
+                    .foregroundColor(.black)
+                    .font(.title)
+            })
+                .buttonStyle(.bordered)
+        }
+    
+    private var newGameButton: some View {
+            Button(action: {
+                classicSet.newGame()
+            }, label: {
+                HStack {
+                    Image(systemName: "shuffle")
+                    Text("new Game")
+                }
+                    .foregroundColor(.black)
+                    .font(.title)
+            })
+                .buttonStyle(.bordered)
+        }
 }
 
 /// A view that displays a Set game card with a shape, color, shading, and amount, based on its model.
@@ -39,14 +75,20 @@ struct CardView: View {
             base.fill(backgroundColor)
             base.strokeBorder(lineWidth: 2)
 
-            HStack {
-                ForEach(0..<amount, id: \.self) { _ in
-                    shape
-                        .padding(3)
-                }
-            }
-                .padding(4)
+            GeometryReader { geometry in
+                let cardHeight = geometry.size.height
+                let cardWidth = geometry.size.width
+                let shapeHeight = cardHeight / 3 * 0.8   // Always divide into 3 slots
+                let shapeWidth = cardWidth * 0.8   // Adjust as needed for padding
 
+                VStack(spacing: 4) {
+                    ForEach(0..<amount, id: \.self) { _ in
+                        shape
+                            .frame(width: shapeWidth, height: shapeHeight)
+                    }
+                }
+                .frame(width: cardWidth, height: cardHeight)
+            }
         }
         .aspectRatio(aspectRatio, contentMode: .fit)
     }
@@ -126,9 +168,9 @@ struct Diamond: Shape {
     func path(in rect: CGRect) -> Path {
         var diamondPath = Path()
         diamondPath.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        diamondPath.addLine(to: CGPoint(x: rect.maxX - 0.2 * rect.width, y: rect.midY))
+        diamondPath.addLine(to: CGPoint(x: rect.maxX - rect.width, y: rect.midY))
         diamondPath.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-        diamondPath.addLine(to: CGPoint(x: rect.minX + 0.2 * rect.width, y: rect.midY))
+        diamondPath.addLine(to: CGPoint(x: rect.minX + rect.width, y: rect.midY))
         diamondPath.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
         return diamondPath
     }
