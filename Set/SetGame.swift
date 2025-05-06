@@ -17,9 +17,7 @@ struct SetGame {
     var gameEnded: Bool {
         (cardPile.isEmpty && displayedCards.count == 3) ? true : false
     }
-    
-    var testCard = Card(shape: Feature.two, color: Feature.one, shading: Feature.three, amount: Feature.three)
-    
+        
     init() {
         for shape in Feature.allCases {
             for color in Feature.allCases {

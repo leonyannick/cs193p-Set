@@ -22,10 +22,6 @@ class ClassicSetGame: ObservableObject {
         return setGame.gameEnded
     }
     
-    var testCard: SetGame.Card {
-        return setGame.testCard
-    }
-    
     func choose(_ card: SetGame.Card) {
         setGame.choose(card)
     }
