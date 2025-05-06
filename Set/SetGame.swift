@@ -35,7 +35,7 @@ struct SetGame {
                 }
             }
         }
-        //cardPile.shuffle()
+        cardPile.shuffle()
         drawCards(count: 12)
     }
     

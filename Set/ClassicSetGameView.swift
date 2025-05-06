@@ -43,7 +43,7 @@ struct ClassicSetGameView: View {
                 HStack {
                     Image(systemName: "rectangle.stack.badge.plus")
                 }
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .font(.title)
             })
                 .buttonStyle(.bordered)
@@ -57,7 +57,7 @@ struct ClassicSetGameView: View {
                     Image(systemName: "shuffle")
                     Text("new Game")
                 }
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .font(.title)
             })
                 .buttonStyle(.bordered)
@@ -77,7 +77,8 @@ struct CardView: View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 12)
             base.fill(backgroundColor)
-            base.strokeBorder(lineWidth: 2)
+            base.strokeBorder(Color.primary, lineWidth: 2)
+
 
             GeometryReader { geometry in
                 let cardHeight = geometry.size.height
@@ -153,10 +154,11 @@ struct CardView: View {
         }
     }
     
+    @Environment(\.colorScheme) var colorScheme
     var backgroundColor: Color {
         switch card.selection {
         case .none:
-            .white
+            colorScheme == .dark ? Color.black : Color.white
         case .selected:
             .gray
         case .containedInValidSet:
